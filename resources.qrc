@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>FS.frag</file>
+        <file>VS.vert</file>
+        <file>textures/yellow.png</file>
+        <file>textures/white.png</file>
+        <file>textures/red.png</file>
+        <file>textures/plastic.png</file>
+        <file>textures/orange.png</file>
+        <file>textures/green.png</file>
+        <file>textures/blue.png</file>
+    </qresource>
+</RCC>
