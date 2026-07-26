@@ -1,21 +1,14 @@
 #pragma once
 
+#include "constants.hpp"
 #include "textures.hpp"
+#include "processor.hpp"
 
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QMatrix4x4>
-
-#define ROT_STEP 80
-#define CUBES_NUM 8
-
-enum class rotation {
-    NONE,
-    BOTTOM_PLUS,
-    RIGHT_PLUS,
-    FRONT_PLUS
-};
+#include <QQueue>
 
 class Cube {
     QMatrix4x4 rotPosition;
@@ -40,11 +33,15 @@ public:
     QOpenGLBuffer vertexBuffer;
     QOpenGLVertexArrayObject VAO;
     rotation rot;
+    QQueue<rotation> rotationsQueue;
     Cube cubes[CUBES_NUM];
+    processor::RubickState state;
 
     Rubick();
     void CreateBuffers(QOpenGLShaderProgram& program);
     void Rotate();
-    void setRotation(rotation tmp_rot);
+    void addRotation(rotation tmp_rot);
+    void setRotation();
     void swapPositions();
+    void solve();
 };

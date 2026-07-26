@@ -2,10 +2,7 @@
 
 #include <QMatrix3x3>
 
-#define CAMERA_Z 5.0f
-
-constexpr float ROTATE_STEP = 180.f / 300;
-constexpr float MAX_POLAR_ANGLE = 180 / 3;
+#include "constants.hpp"
 
 Camera::Camera() :
     azimuthalAxe(QVector3D(CAMERA_Z, 0.0f, -CAMERA_Z * std::tan(M_PI / 6))),

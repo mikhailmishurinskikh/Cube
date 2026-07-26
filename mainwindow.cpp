@@ -1,6 +1,7 @@
 #include "mainwindow.hpp"
 #include "openglrender.hpp"
-#include "ui_mainwindow.h"
+#include "ui/ui_mainwindow.h"
+#include "constants.hpp"
 
 #include <QKeyEvent>
 
@@ -9,12 +10,23 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    connect(ui->actionRight, &QAction::triggered,
-            ui->Render, &OpenGLRender::rotateRight);
-    connect(ui->actionBottom, &QAction::triggered,
-            ui->Render, &OpenGLRender::rotateBottom);
-    connect(ui->actionFront, &QAction::triggered,
-            ui->Render, &OpenGLRender::rotateFront);
+    connect(ui->actionRight, &QAction::triggered, this,
+        [this]() {
+            ui->Render->rotate(rotation::Right);
+        });
+    connect(ui->actionBottom, &QAction::triggered, this,
+        [this]() {
+            ui->Render->rotate(rotation::Bottom);
+        });
+    connect(ui->actionFront, &QAction::triggered, this,
+        [this]() {
+            ui->Render->rotate(rotation::Front);
+        });
+
+    connect(ui->actionSolve, &QAction::triggered, this,
+        [this]() {
+            ui->Render->solve();
+        });
 }
 
 MainWindow::~MainWindow()

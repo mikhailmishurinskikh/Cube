@@ -7,16 +7,11 @@
 #include <QOpenGLFunctions>
 #include <QTimer>
 
-namespace Ui {
-class OpenGLRender;
-}
-
 class OpenGLRender : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
 
 public:
     explicit OpenGLRender(QWidget *parent = nullptr);
-    ~OpenGLRender();
 
     Camera camera;
 
@@ -28,16 +23,13 @@ protected:
     void initializeShaders();
 
 private:
-    Ui::OpenGLRender *ui;
-
     QOpenGLShaderProgram shaderProgram;
     Rubick rubick;
     Textures textures;
     QTimer timer;
 
 public slots:
-    void rotateRight();
-    void rotateBottom();
-    void rotateFront();
+    void rotate(rotation rot);
+    void solve();
 };
 

@@ -1,24 +1,19 @@
 #include "openglrender.hpp"
-#include "ui_openglrender.h"
+
+#include <QMessageBox>
 
 OpenGLRender::OpenGLRender(QWidget* parent) :
     QOpenGLWidget(parent),
-    ui(new Ui::OpenGLRender),
     timer()
 {
-    ui->setupUi(this);
     connect(&timer, &QTimer::timeout, this, [this]() {
-        if (rubick.rot != rotation::NONE || camera.azimuthalSign != 0 || camera.polarSign != 0) {
+        if (rubick.rot != rotation::None || camera.azimuthalSign != 0 || camera.polarSign != 0) {
             update();  // Запускает paintGL()
         }
     });
     timer.start(16);  // 60 FPS
 }
 
-OpenGLRender::~OpenGLRender()
-{
-    delete ui;
-}
 
 void OpenGLRender::initializeGL()
 {
@@ -32,7 +27,7 @@ void OpenGLRender::initializeGL()
 
 void OpenGLRender::paintGL()
 {
-    if (rubick.rot != rotation::NONE) rubick.Rotate();
+    if (rubick.rot != rotation::None) rubick.Rotate();
     if (camera.azimuthalSign != 0) camera.azimuthalRotate();
     if (camera.polarSign != 0) camera.polarRotate();
 
@@ -67,10 +62,10 @@ void OpenGLRender::resizeGL(int w, int h)
 
 void OpenGLRender::initializeShaders()
 {
-    if (!shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/FS.frag")) {
+    if (!shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/FS.frag")) {
         throw std::runtime_error("Fragment shader loading failed");
     };
-    if (!shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/VS.vert")) {
+    if (!shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/VS.vert")) {
         throw std::runtime_error("Vertex shader loading failed");
     };
     if (!shaderProgram.link()) {
@@ -78,17 +73,13 @@ void OpenGLRender::initializeShaders()
     };
 }
 
-void OpenGLRender::rotateRight()
+void OpenGLRender::rotate(rotation rot)
 {
-    rubick.setRotation(rotation::RIGHT_PLUS);
+    rubick.addRotation(rot);
 }
 
-void OpenGLRender::rotateBottom()
+void OpenGLRender::solve()
 {
-    rubick.setRotation(rotation::BOTTOM_PLUS);
+    rubick.solve();
 }
 
-void OpenGLRender::rotateFront()
-{
-    rubick.setRotation(rotation::FRONT_PLUS);
-}

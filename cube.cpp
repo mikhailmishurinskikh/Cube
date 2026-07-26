@@ -70,7 +70,7 @@ void Cube::Rotate(QVector3D rotDirection, int rotSign)
 }
 
 Rubick::Rubick() :
-    rotSign(0), step(0), rot(rotation::NONE), cubes {
+    rotSign(0), step(0), rot(rotation::None), state(), cubes {
         Cube(0, QVector3D(1.0f, 0.0f, 0.0f), colors::WHITE, colors::GREEN, colors::RED),
         Cube(-90, QVector3D(0.0f, 0.0f, 1.0f), colors::BLUE, colors::WHITE, colors::RED),
         Cube(180, QVector3D(0.0f, 0.0f, 1.0f), colors::YELLOW, colors::BLUE, colors::RED),
@@ -114,41 +114,58 @@ void Rubick::Rotate() {
         rotSign = 0;
         step = 0;
         swapPositions();
-        rot = rotation::NONE;
+        setRotation();
     }
 }
 
-void Rubick::setRotation(rotation tmp_rot) {
-    rot = tmp_rot;
-    switch (tmp_rot) {
-    case rotation::NONE: break;
-    case rotation::FRONT_PLUS:
-        rotDirection = QVector3D(0.0f, 0.0f, 1.0f);
-        rotSign = 1;
-        rotPositions[0] = 0;
-        rotPositions[1] = 1;
-        rotPositions[2] = 2;
-        rotPositions[3] = 3;
-        break;
-
-    case rotation::BOTTOM_PLUS:
-        rotDirection = QVector3D(0.0f, 1.0f, 0.0f);
-        rotSign = 1;
-        rotPositions[0] = 0;
-        rotPositions[1] = 1;
-        rotPositions[2] = 5;
-        rotPositions[3] = 4;
-        break;
-
-    case rotation::RIGHT_PLUS:
-        rotDirection = QVector3D(1.0f, 0.0f, 0.0f);
-        rotSign = 1;
-        rotPositions[0] = 0;
-        rotPositions[1] = 3;
-        rotPositions[2] = 7;
-        rotPositions[3] = 4;
-        break;
+void Rubick::addRotation(rotation tmp_rot)
+{
+    rotationsQueue.enqueue(tmp_rot);
+    if (rot == rotation::None) {
+        setRotation();
     }
+}
+
+void Rubick::setRotation() {
+    if (rotationsQueue.isEmpty()) {
+        rot = rotation::None;
+        return;
+    }
+
+    rot = rotationsQueue.dequeue();
+
+    switch (rot) {
+        case rotation::Front:
+            rotDirection = QVector3D(0.0f, 0.0f, 1.0f);
+            rotSign = 1;
+            rotPositions[0] = 0;
+            rotPositions[1] = 1;
+            rotPositions[2] = 2;
+            rotPositions[3] = 3;
+            break;
+
+        case rotation::Bottom:
+            rotDirection = QVector3D(0.0f, 1.0f, 0.0f);
+            rotSign = 1;
+            rotPositions[0] = 0;
+            rotPositions[1] = 1;
+            rotPositions[2] = 5;
+            rotPositions[3] = 4;
+            break;
+
+        case rotation::Right:
+            rotDirection = QVector3D(1.0f, 0.0f, 0.0f);
+            rotSign = 1;
+            rotPositions[0] = 0;
+            rotPositions[1] = 3;
+            rotPositions[2] = 7;
+            rotPositions[3] = 4;
+            break;
+
+        case rotation::None: return;
+    }
+
+    state.makeTurn(rot);
 }
 
 void Rubick::swapPositions() {
@@ -157,4 +174,13 @@ void Rubick::swapPositions() {
     positions[rotPositions[1]] = positions[rotPositions[2]];
     positions[rotPositions[2]] = positions[rotPositions[3]];
     positions[rotPositions[3]] = tmp;
+}
+
+void Rubick::solve()
+{
+    QVector<rotation> solution = processor::findSolution(state);
+
+    for (rotation rot: solution) {
+        addRotation(rot);
+    }
 }
